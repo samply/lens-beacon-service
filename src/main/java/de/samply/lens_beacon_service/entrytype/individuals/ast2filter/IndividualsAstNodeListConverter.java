@@ -2,6 +2,7 @@ package de.samply.lens_beacon_service.entrytype.individuals.ast2filter;
 
 import de.samply.lens_beacon_service.beacon.model.BeaconFilter;
 import de.samply.lens_beacon_service.ast2filter.AstNodeListConverter;
+import de.samply.lens_beacon_service.entrytype.genomicVariations.ast2filter.GenomicVariationsAstNodeConverter;
 import de.samply.lens_beacon_service.lens.AstNode;
 
 /**
@@ -20,6 +21,15 @@ public class IndividualsAstNodeListConverter extends AstNodeListConverter {
                     break;
                 case "ethnicity":
                     beaconFilter = new EthnicityAstNodeConverter().convert(astNode);
+                    break;
+                case "disease":
+                    beaconFilter = new DiseaseAstNodeConverter().convert(astNode);
+                    break;
+                case "geographicOrigin":
+                    beaconFilter = new GeographicOriginAstNodeConverter().convert(astNode);
+                    break;
+                case "procedureCode":
+                    beaconFilter = new ProcedureCodeAstNodeConverter().convert(astNode);
                     break;
             }
 
