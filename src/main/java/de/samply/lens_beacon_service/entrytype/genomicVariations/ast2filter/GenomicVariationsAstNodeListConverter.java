@@ -20,6 +20,12 @@ public class GenomicVariationsAstNodeListConverter extends AstNodeListConverter 
                 case "genomic_variation":
                     beaconFilter = new GenomicVariationsAstNodeConverter().convert(astNode);
                     break;
+                case "variant_type":
+                    beaconFilter = new VariantTypeAstNodeConverter().convert(astNode);
+                    break;
+                case "zygosity":
+                    beaconFilter = new ZygosityAstNodeConverter().convert(astNode);
+                    break;
             }
 
         return beaconFilter;

@@ -1,5 +1,7 @@
 package de.samply.lens_beacon_service.beacon;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.lens_beacon_service.entrytype.EntryType;
 import de.samply.lens_beacon_service.Utils;
 import de.samply.lens_beacon_service.beacon.model.BeaconFilter;
@@ -109,10 +111,21 @@ public class BeaconQueryService {
     private BeaconResponse query(EntryType entryType, List<BeaconFilter> filters) {
         if (entryType == null)
             return null;
-        if (entryType.beaconEndpoint.method.equals("POST"))
-            return postQuery(entryType.beaconEndpoint.uri, filters);
-        else
-            return getQuery(entryType.beaconEndpoint.uri);
+        try {
+            if (entryType.beaconEndpoint.method.equals("POST"))
+                return postQuery(entryType.beaconEndpoint.uri, filters);
+            else
+                return getQuery(entryType.beaconEndpoint.uri);
+        } catch (Exception e) {
+            log.error(Utils.traceFromException(e));
+            try {
+                log.error("\nfilters: " + new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(filters));
+            } catch (JsonProcessingException ex) {
+                log.error(Utils.traceFromException(ex));
+                return null;
+            }
+            return null;
+        }
     }
 
     /**
