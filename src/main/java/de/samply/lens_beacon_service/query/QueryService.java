@@ -63,8 +63,10 @@ public class QueryService {
         for (Site site: sites) {
             MeasureReportAdmin measureReportAdmin = new MeasureReportAdmin();
 
-            for (EntryType entryType: site.entryTypes)
+            for (EntryType entryType: site.entryTypes) {
+                log.info("runQuery: entryType: "+ entryType.beaconEndpoint.getEntryType());
                 measureReportAdmin.measureReport.addGroup(entryType.query.runQueryAtSite(site.beaconQueryService, entryType));
+            }
 
             String jsonMeasure = measureReportAdmin.toString();
             jsonResults = jsonResults.replaceAll("\"PLACEHOLDER" + site.name + "\"", "\n" + jsonMeasure.replaceAll("^", "        "));

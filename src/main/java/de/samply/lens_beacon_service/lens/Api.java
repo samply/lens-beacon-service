@@ -62,6 +62,8 @@ public class Api {
     try {
       String jsonResult = queryService.runQuery(astNode);
 
+      log.info("postAstQuery: jsonResult: " + jsonResult);
+
       return addCorsHeaders(Response.ok(jsonResult)).header("Access-Control-Expose-Headers", "Location").build();
     } catch (Exception e) {
       log.error("Error while creating a structured query.", e);

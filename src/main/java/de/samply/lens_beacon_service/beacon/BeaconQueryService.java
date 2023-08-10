@@ -90,8 +90,23 @@ public class BeaconQueryService {
         Integer count = -1;
         try {
             BeaconResponse response = query(entryType, beaconFilters);
-            if (response != null)
+            if (response != null) {
                 count = response.getCount();
+                if (entryType.beaconEndpoint.getEntryType().equals("cohorts")) {
+                    log.info("");
+                    log.info("");
+                    log.info("");
+                    log.info("");
+                    log.info("\nPOST Full URL: " + siteUrl + entryType.beaconEndpoint.uri);
+                    log.info("\nfilters: " + new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(beaconFilters));
+                    log.info("response: " + new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(response));
+                    log.info("count: " + count);
+                    log.info("");
+                    log.info("");
+                    log.info("");
+                    log.info("");
+                }
+            }
         } catch (Exception e) {
             log.error("runQuery: problem with " + entryType.beaconEndpoint.getEntryType() + ", trace: " + Utils.traceFromException(e));
         }
@@ -133,12 +148,10 @@ public class BeaconQueryService {
      *
      * Use a GET request.
      *
-     * @param uri The URI of the objects be queried, e.g. "individuals" or "biosamples".
+     * @param uri The URI of the objects be queried, e.g. "individuals" or "cohorts".
      * @return JSON-format list of objects of a given type.
      */
     private BeaconResponse getQuery(String uri) {
-        log.info("\nGET Full URL: " + siteUrl + uri);
-
         return webClient
                 .get()
                 .uri(uri)
@@ -152,14 +165,12 @@ public class BeaconQueryService {
      *
      * Use a POST request.
      *
-     * @param uri The URI of the objects be queried, e.g. "individuals" or "biosamples".
+     * @param uri The URI of the objects be queried, e.g. "individuals" or "cohorts".
      * @param beaconFilters Filters that will be applied to the query.
      * @return JSON-format list of objects of a given type.
      */
     private BeaconResponse postQuery(String uri, List<BeaconFilter> beaconFilters) {
         String jsonBeaconRequest = (new BeaconRequest(query.clone(beaconFilters))).toString();
-        log.info("\nPOST Full URL: " + siteUrl + uri);
-
         return webClient
                 .post()
                 .uri(uri)

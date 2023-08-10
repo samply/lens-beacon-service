@@ -5,7 +5,7 @@ import de.samply.lens_beacon_service.ast2filter.AstNodeListConverter;
 import de.samply.lens_beacon_service.lens.AstNode;
 
 /**
- * Convert a list of AstNode leaf elements into a list of Beacon filters for biosamples.
+ * Convert a list of AstNode leaf elements into a list of Beacon filters for cohorts.
  */
 
 public class BiosamplesAstNodeListConverter extends AstNodeListConverter {
@@ -16,7 +16,10 @@ public class BiosamplesAstNodeListConverter extends AstNodeListConverter {
             // Choose the relevant converter for this AstNode.
             switch (astNode.key) {
                 case "sample_kind":
-                    beaconFilter = new BiosamplesAstNodeConverter().convert(astNode);
+                    beaconFilter = new SampleKindAstNodeConverter().convert(astNode);
+                    break;
+                case "biosample_status":
+                    beaconFilter = new BiosampleStatusAstNodeConverter().convert(astNode);
                     break;
             }
 

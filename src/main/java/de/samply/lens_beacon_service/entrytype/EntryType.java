@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Brings together all of the operations and data associated with a single entry type (e.g.
- * biosamples) for a single site (e.g. EGA Cineca or Molgenis mutations).
+ * cohorts) for a single site (e.g. EGA Cineca or Molgenis mutations).
  */
 public class EntryType {
     public EntryType() {

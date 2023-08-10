@@ -4,6 +4,7 @@ import de.samply.lens_beacon_service.beacon.model.GranularityUcBeaconQuery;
 import de.samply.lens_beacon_service.entrytype.biosamples.BiosamplesEntryType;
 import de.samply.lens_beacon_service.entrytype.genomicVariations.GenomicVariationsEntryType;
 import de.samply.lens_beacon_service.entrytype.individuals.IndividualsEntryType;
+import de.samply.lens_beacon_service.entrytype.cohorts.CohortsEntryType;
 
 public class EgaCinecaSite extends Site {
     public EgaCinecaSite() {
@@ -12,6 +13,7 @@ public class EgaCinecaSite extends Site {
         query = new GranularityUcBeaconQuery();
         entryTypes.add(new IndividualsEntryType());
         entryTypes.add(new BiosamplesEntryType());
+        entryTypes.add(new CohortsEntryType());
         entryTypes.add(new GenomicVariationsEntryType());
         init();
     }

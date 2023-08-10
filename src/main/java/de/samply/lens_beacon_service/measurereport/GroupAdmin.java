@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Groups are the first-level subcomponents of a measure report, e.g. individuals, biosamples,
+ * Groups are the first-level subcomponents of a measure report, e.g. individuals, cohorts,
  * genomic variants, etc.
  *
  * This is the base class for generating a new group.

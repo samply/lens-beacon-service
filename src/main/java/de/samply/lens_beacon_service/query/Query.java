@@ -2,14 +2,16 @@ package de.samply.lens_beacon_service.query;
 
 import de.samply.lens_beacon_service.beacon.BeaconQueryService;
 import de.samply.lens_beacon_service.entrytype.EntryType;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.MeasureReport;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public abstract class Query {
     /**
-     * Run queries for stratifiers on the genomicVariations endpoint at a given Beacon site, using the supplied filters.
+     * Run queries for stratifiers on an endpoint at a given Beacon site, using the supplied filters.
      *
      * The measureReportAdmin will be used to store the results of the query.
      *
@@ -19,7 +21,7 @@ public abstract class Query {
     public abstract void runStratifierQueriesAtSite(BeaconQueryService beaconQueryService, EntryType entryType);
 
     /**
-     * Run a query on the genomicVariations endpoint at a given Beacon site, using the supplied filters.
+     * Run a query on an endpoint at a given Beacon site, using the supplied filters.
      *
      * @param entryType
      * @return The measure report group where the query results were stored.
@@ -28,6 +30,10 @@ public abstract class Query {
         // Get and store the population count. This is always needed.
         Integer count = beaconQueryService.runBeaconEntryTypeQueryAtSite(entryType, entryType.baseFilters);
         entryType.groupAdmin.setCount(count);
+        if (entryType.beaconEndpoint.getEntryType().equals("cohorts")) {
+            log.info("runQueryAtSite: count: " + count);
+            log.info("group: " + entryType.groupAdmin.group);
+        }
 
         runStratifierQueriesAtSite(beaconQueryService, entryType);
 

@@ -17,4 +17,13 @@ public class BiosamplesNameOntologyMaps {
         biosmapleTypeUberon.put("blood-plasma", "UBERON:0001969");
         biosmapleTypeUberon.put("lymph", "UBERON:0002391");
     }
+
+    // Maps the standard names for sample status onto EFO codes
+    public static Map<String, String> biosmapleStatusEfo;
+    static {
+        biosmapleStatusEfo = new HashMap<String, String>();
+
+        biosmapleStatusEfo.put("Reference sample", "EFO:0009654");
+        biosmapleStatusEfo.put("Abnormal sample", "EFO:0009655");
+    }
 }

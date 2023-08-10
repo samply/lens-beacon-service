@@ -1,11 +1,14 @@
 package de.samply.lens_beacon_service.beacon.model;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
 /**
  * Used to capture the response that comes back from Beacon when an API call is made.
  */
 
+@Slf4j
 public class BeaconResponse {
     public Map meta;
     public Map responseSummary; // all queries should put something here, even if the number of results is 0.
@@ -31,9 +34,13 @@ public class BeaconResponse {
             if (this.responseSummary.get("exists").toString().equals("true")) {
                 return 1;
             } else {
+                log.info("Boolean false returned by Beacon");
                 return 0;
             }
         }
+
+        log.info("Numerical response returned by Beacon");
+
         // We have a results count, so cast it to Integer and return it.
         return (Integer) this.responseSummary.get("numTotalResults");
     }
