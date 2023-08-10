@@ -5,6 +5,7 @@ import de.samply.lens_beacon_service.entrytype.biosamples.BiosamplesEntryType;
 import de.samply.lens_beacon_service.entrytype.genomicVariations.GenomicVariationsEntryType;
 import de.samply.lens_beacon_service.entrytype.individuals.IndividualsEntryType;
 import de.samply.lens_beacon_service.entrytype.cohorts.CohortsEntryType;
+import de.samply.lens_beacon_service.entrytype.runs.RunsEntryType;
 
 public class EgaCinecaSite extends Site {
     public EgaCinecaSite() {
@@ -14,6 +15,7 @@ public class EgaCinecaSite extends Site {
         entryTypes.add(new IndividualsEntryType());
         entryTypes.add(new BiosamplesEntryType());
         entryTypes.add(new CohortsEntryType());
+        entryTypes.add(new RunsEntryType());
         entryTypes.add(new GenomicVariationsEntryType());
         init();
     }

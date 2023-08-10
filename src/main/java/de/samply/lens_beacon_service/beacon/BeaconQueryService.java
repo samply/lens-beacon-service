@@ -92,7 +92,7 @@ public class BeaconQueryService {
             BeaconResponse response = query(entryType, beaconFilters);
             if (response != null) {
                 count = response.getCount();
-                if (entryType.beaconEndpoint.getEntryType().equals("cohorts")) {
+                if (entryType.beaconEndpoint.getEntryType().equals("runs")) {
                     log.info("");
                     log.info("");
                     log.info("");
