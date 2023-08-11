@@ -6,6 +6,7 @@ import de.samply.lens_beacon_service.entrytype.genomicVariations.GenomicVariatio
 import de.samply.lens_beacon_service.entrytype.individuals.IndividualsEntryType;
 import de.samply.lens_beacon_service.entrytype.cohorts.CohortsEntryType;
 import de.samply.lens_beacon_service.entrytype.runs.RunsEntryType;
+import de.samply.lens_beacon_service.entrytype.datasets.DatasetsEntryType;
 
 public class HdCinecaSite extends Site {
     public HdCinecaSite() {
@@ -16,6 +17,7 @@ public class HdCinecaSite extends Site {
         entryTypes.add(new BiosamplesEntryType("/biosamples/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new CohortsEntryType("/cohorts/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new RunsEntryType("/runs/", "POST")); // Error 380 w/o trailing slash
+        entryTypes.add(new DatasetsEntryType("/datasets/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new GenomicVariationsEntryType("/g_variants/", "POST")); // Error 380 w/o trailing slash
         init();
     }
