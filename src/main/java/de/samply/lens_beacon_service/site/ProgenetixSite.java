@@ -7,6 +7,7 @@ import de.samply.lens_beacon_service.entrytype.individuals.IndividualsEntryType;
 import de.samply.lens_beacon_service.entrytype.cohorts.CohortsEntryType;
 import de.samply.lens_beacon_service.entrytype.runs.RunsEntryType;
 import de.samply.lens_beacon_service.entrytype.datasets.DatasetsEntryType;
+import de.samply.lens_beacon_service.entrytype.analyses.AnalysesEntryType;
 
 public class ProgenetixSite extends Site {
     public ProgenetixSite() {
@@ -17,7 +18,8 @@ public class ProgenetixSite extends Site {
         entryTypes.add(new CohortsEntryType());
         entryTypes.add(new RunsEntryType());
         entryTypes.add(new DatasetsEntryType());
-        entryTypes.add(new BiosamplesEntryType());
+        entryTypes.add(new DatasetsEntryType());
+        entryTypes.add(new AnalysesEntryType());
         entryTypes.add(new GenomicVariationsEntryType());
         init();
     }

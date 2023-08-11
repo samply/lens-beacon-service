@@ -7,6 +7,7 @@ import de.samply.lens_beacon_service.lens.AstNode;
 import de.samply.lens_beacon_service.measurereport.GroupAdmin;
 import de.samply.lens_beacon_service.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,6 @@ public class EntryType {
     public GroupAdmin groupAdmin; // Add counts and stuff to measure report group.
 
     public void convert(AstNode astNode) {
-        baseFilters = astNodeListConverter.convert(astNode);
+        baseFilters = astNodeListConverter == null ? new ArrayList<BeaconFilter>() : astNodeListConverter.convert(astNode);
     }
 }
