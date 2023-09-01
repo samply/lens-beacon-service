@@ -1,8 +1,11 @@
 package de.samply.lens_beacon_service.site;
 
+import de.samply.lens_beacon_service.beacon.BeaconQueryServiceApacheHttp;
+import de.samply.lens_beacon_service.beacon.BeaconQueryServiceSpringWebClient;
 import de.samply.lens_beacon_service.beacon.model.BeaconQuery;
 import de.samply.lens_beacon_service.entrytype.EntryType;
 import de.samply.lens_beacon_service.beacon.BeaconQueryService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +16,25 @@ import java.util.List;
  * This information includes a name that we can give the site, the URL of the
  * API, plus information about some of the endpoints (BeaconEndpoint).
  */
-public class Site {
-    protected void init() {
-        beaconQueryService = new BeaconQueryService(url, query);
+@Slf4j
+public abstract class Site {
+    public Site() {
+        init();
+        log.info("Site: name: " + name);
+        log.info("Site: url: " + url);
+        log.info("Site: proxyUrl: " + proxyUrl);
+        log.info("Site: proxyPort: " + proxyPort);
+        beaconQueryService = new BeaconQueryServiceApacheHttp(url, proxyUrl, proxyPort, query);
+//        beaconQueryService = new BeaconQueryServiceSpringWebClient(url, proxyUrl, proxyPort, query);
     }
+
+    protected abstract void init();
 
     public String name; // Site name, e.g. "HD Cineca".
 
     public String url; // URL of site, e.g. "http://beacon:5050/api".
+    public String proxyUrl = null;
+    public String proxyPort = null;
     public BeaconQuery query; // Beacon query, minus the filters.
     public BeaconQueryService beaconQueryService; // Automatically derived from URL
     public List<EntryType> entryTypes = new ArrayList<EntryType>();

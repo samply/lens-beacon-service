@@ -2,6 +2,7 @@ package de.samply.lens_beacon_service.beacon.model;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +14,7 @@ public class BeaconResponse {
     public Map meta;
     public Map responseSummary; // all queries should put something here, even if the number of results is 0.
     public Map response; // count or boolean queries should not fill this, only detail queries will put something in this variable.
+    public List beaconHandovers; // not used, but present to avoid errors during JSON parsing.
 
     /**
      * Extract a hit count from the responseSummary, and return it.

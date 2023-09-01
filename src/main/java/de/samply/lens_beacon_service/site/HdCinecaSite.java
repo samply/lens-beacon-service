@@ -8,9 +8,11 @@ import de.samply.lens_beacon_service.entrytype.cohorts.CohortsEntryType;
 import de.samply.lens_beacon_service.entrytype.runs.RunsEntryType;
 import de.samply.lens_beacon_service.entrytype.datasets.DatasetsEntryType;
 import de.samply.lens_beacon_service.entrytype.analyses.AnalysesEntryType;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class HdCinecaSite extends Site {
-    public HdCinecaSite() {
+    protected void init() {
         name = "HD Cineca";
         url = "http://beacon:5050/api";
         query = new GranularityLcBeaconQuery();
@@ -21,6 +23,6 @@ public class HdCinecaSite extends Site {
         entryTypes.add(new DatasetsEntryType("/datasets/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new AnalysesEntryType("/analyses/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new GenomicVariationsEntryType("/g_variants/", "POST")); // Error 380 w/o trailing slash
-        init();
+        log.info("HdCinecaSite: name: " + name);
     }
 }

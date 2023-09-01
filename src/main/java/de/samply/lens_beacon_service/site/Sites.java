@@ -20,6 +20,7 @@ public class Sites {
 
         // Site definitions
         sites.add(new HdCinecaSite());
+        sites.add(new HdCinecaBeamConnectSite());
 //        sites.add(new EgaCinecaSite());
 //        sites.add(new MolgenisMutationsSite());
 //        sites.add(new RdcPlaygroundSite());

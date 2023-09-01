@@ -114,6 +114,18 @@
             <artifactId>hapi-fhir-structures-r4</artifactId>
             <version>6.4.3</version>
         </dependency>
+
+        <!-- Apache HttpClient, used to contact Beacon API. -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.15</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -122,6 +134,14 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
         </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>11</source>
+                  <target>11</target>
+              </configuration>
+          </plugin>
       </plugins>
     </build>
 </project>

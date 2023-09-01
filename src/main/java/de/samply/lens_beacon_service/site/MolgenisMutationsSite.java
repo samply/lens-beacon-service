@@ -6,13 +6,12 @@ import de.samply.lens_beacon_service.entrytype.genomicVariations.GenomicVariatio
 import de.samply.lens_beacon_service.entrytype.individuals.IndividualsEntryType;
 
 public class MolgenisMutationsSite extends Site {
-    public MolgenisMutationsSite() {
+    protected void init() {
         name = "Molgenis mutations";
         url = "https://mutatiedatabases.molgeniscloud.org/api/beacon";
         query = new GranularityUcBeaconQuery();
         entryTypes.add(new IndividualsEntryType());
         entryTypes.add(new BiosamplesEntryType("/biosamples", "GET")); // Uses GET, deviates from Beacon 2 standard
         entryTypes.add(new GenomicVariationsEntryType("/g_variants", "GET")); // Uses GET, deviates from Beacon 2 standard
-        init();
     }
 }

@@ -10,7 +10,7 @@ import de.samply.lens_beacon_service.entrytype.datasets.DatasetsEntryType;
 import de.samply.lens_beacon_service.entrytype.analyses.AnalysesEntryType;
 
 public class ProgenetixSite extends Site {
-    public ProgenetixSite() {
+    protected void init() {
         name = "Progenetix";
         url = "https://progenetix.org/beacon";
         query = new GranularityUcBeaconQuery();
@@ -21,6 +21,5 @@ public class ProgenetixSite extends Site {
         entryTypes.add(new DatasetsEntryType());
         entryTypes.add(new AnalysesEntryType());
         entryTypes.add(new GenomicVariationsEntryType());
-        init();
     }
 }

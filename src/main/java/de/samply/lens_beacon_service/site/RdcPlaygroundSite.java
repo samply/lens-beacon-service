@@ -5,12 +5,11 @@ import de.samply.lens_beacon_service.entrytype.biosamples.BiosamplesEntryType;
 import de.samply.lens_beacon_service.entrytype.individuals.IndividualsEntryType;
 
 public class RdcPlaygroundSite extends Site {
-    public RdcPlaygroundSite() {
+    protected void init() {
         name = "RDConnect playground";
         url = "https://playground.rd-connect.eu/beacon2/api";
         query = new GranularityUcBeaconQuery();
         entryTypes.add(new IndividualsEntryType());
         entryTypes.add(new BiosamplesEntryType());
-        init();
     }
 }

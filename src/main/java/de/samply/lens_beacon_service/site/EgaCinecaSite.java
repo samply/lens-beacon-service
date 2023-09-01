@@ -10,7 +10,7 @@ import de.samply.lens_beacon_service.entrytype.datasets.DatasetsEntryType;
 import de.samply.lens_beacon_service.entrytype.analyses.AnalysesEntryType;
 
 public class EgaCinecaSite extends Site {
-    public EgaCinecaSite() {
+    protected void init() {
         name = "EGA Cineca";
         url = "https://ega-archive.org/beacon-apis/cineca";
         query = new GranularityUcBeaconQuery();
@@ -21,6 +21,5 @@ public class EgaCinecaSite extends Site {
         entryTypes.add(new DatasetsEntryType());
         entryTypes.add(new AnalysesEntryType());
         entryTypes.add(new GenomicVariationsEntryType());
-        init();
     }
 }
