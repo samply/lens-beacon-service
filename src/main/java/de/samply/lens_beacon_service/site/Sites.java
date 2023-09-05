@@ -19,7 +19,7 @@ public class Sites {
         List<Site> sites = new ArrayList<Site>();
 
         // Site definitions
-        sites.add(new HdCinecaSite());
+//        sites.add(new HdCinecaSite());
         sites.add(new HdCinecaBeamConnectSite());
 //        sites.add(new EgaCinecaSite());
 //        sites.add(new MolgenisMutationsSite());

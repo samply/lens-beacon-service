@@ -1,7 +1,5 @@
 package de.samply.lens_beacon_service.site;
 
-import de.samply.lens_beacon_service.beacon.BeaconQueryServiceApacheHttp;
-import de.samply.lens_beacon_service.beacon.BeaconQueryServiceSpringWebClient;
 import de.samply.lens_beacon_service.beacon.model.BeaconQuery;
 import de.samply.lens_beacon_service.entrytype.EntryType;
 import de.samply.lens_beacon_service.beacon.BeaconQueryService;
@@ -24,8 +22,7 @@ public abstract class Site {
         log.info("Site: url: " + url);
         log.info("Site: proxyUrl: " + proxyUrl);
         log.info("Site: proxyPort: " + proxyPort);
-        beaconQueryService = new BeaconQueryServiceApacheHttp(url, proxyUrl, proxyPort, query);
-//        beaconQueryService = new BeaconQueryServiceSpringWebClient(url, proxyUrl, proxyPort, query);
+        beaconQueryService = new BeaconQueryService(url, proxyUrl, proxyPort, proxyApiKey, query);
     }
 
     protected abstract void init();
@@ -35,6 +32,7 @@ public abstract class Site {
     public String url; // URL of site, e.g. "http://beacon:5050/api".
     public String proxyUrl = null;
     public String proxyPort = null;
+    public String proxyApiKey = null;
     public BeaconQuery query; // Beacon query, minus the filters.
     public BeaconQueryService beaconQueryService; // Automatically derived from URL
     public List<EntryType> entryTypes = new ArrayList<EntryType>();

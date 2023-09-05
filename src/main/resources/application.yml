@@ -1,0 +1,4 @@
+proxy:
+  url: "lensbeacon-beam-connect"
+  port: "8062"
+  apikey: ${PROXY_API_KEY}
