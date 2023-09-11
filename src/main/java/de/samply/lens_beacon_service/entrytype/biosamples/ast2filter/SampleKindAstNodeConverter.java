@@ -14,6 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SampleKindAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, BiosamplesNameOntologyMaps.biosmapleTypeUberon));
+        return(astAndOntologyMapToFilter(astNode, BiosamplesNameOntologyMaps.biosmapleTypeUberon));
     }
 }

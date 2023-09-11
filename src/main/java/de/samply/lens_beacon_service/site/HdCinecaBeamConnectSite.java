@@ -18,6 +18,5 @@ public class HdCinecaBeamConnectSite extends HdCinecaSite {
         proxyUrl = GlobalVariables.configuration.getProxyUrl(); // URL of Beam-Connect, see docker-compose.yml
         proxyPort = GlobalVariables.configuration.getProxyPort();
         proxyApiKey = GlobalVariables.configuration.getProxyApiKey();
-        log.info("HdCinecaBeamConnectSite: name: " + name);
     }
 }

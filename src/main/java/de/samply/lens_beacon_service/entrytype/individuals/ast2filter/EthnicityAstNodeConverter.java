@@ -12,6 +12,6 @@ import de.samply.lens_beacon_service.lens.AstNode;
 public class EthnicityAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, IndividualsNameOntologyMaps.ethnicityNameNcit));
+        return(astAndOntologyMapToFilter(astNode, IndividualsNameOntologyMaps.ethnicityNameNcit));
     }
 }

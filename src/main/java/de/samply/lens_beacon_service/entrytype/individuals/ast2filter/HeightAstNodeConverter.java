@@ -10,9 +10,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class ProcedureCodeAstNodeConverter extends AstNodeConverter {
+public class HeightAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(astAndOntologyTermToFilter(astNode, "OPCS4"));
+        return(astOperatorAndOntologyToFilter(astNode, "LOINC", "8308-9"));
     }
 }

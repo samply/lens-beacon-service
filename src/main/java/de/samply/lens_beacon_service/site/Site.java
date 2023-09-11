@@ -18,10 +18,6 @@ import java.util.List;
 public abstract class Site {
     public Site() {
         init();
-        log.info("Site: name: " + name);
-        log.info("Site: url: " + url);
-        log.info("Site: proxyUrl: " + proxyUrl);
-        log.info("Site: proxyPort: " + proxyPort);
         beaconQueryService = new BeaconQueryService(url, proxyUrl, proxyPort, proxyApiKey, query);
     }
 

@@ -12,6 +12,6 @@ import de.samply.lens_beacon_service.lens.AstNode;
 public class DiseaseAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, IndividualsNameOntologyMaps.diseaseIcd10));
+        return(astAndOntologyMapToFilter(astNode, IndividualsNameOntologyMaps.diseaseIcd10));
     }
 }

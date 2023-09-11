@@ -12,6 +12,6 @@ import de.samply.lens_beacon_service.lens.AstNode;
 public class CohortsGeographicOriginAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, CohortsNameOntologyMaps.geographicOriginGaz));
+        return(astAndOntologyMapToFilter(astNode, CohortsNameOntologyMaps.geographicOriginGaz));
     }
 }

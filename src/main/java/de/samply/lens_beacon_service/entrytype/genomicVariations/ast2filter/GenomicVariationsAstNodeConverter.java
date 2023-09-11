@@ -19,7 +19,6 @@ public class GenomicVariationsAstNodeConverter extends AstNodeConverter {
         value = value.replace(":", "");
         value = value.replace(".", "");
         value = value.replace(">", "");
-        value = "HGVSid:" + value;
-        return new BeaconFilter("id", value);
+        return(ontologyAndValueToFilter("HGVSid", value));
     }
 }

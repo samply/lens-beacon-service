@@ -22,6 +22,8 @@ import java.util.HashMap;
 
 @Slf4j
 public class BeaconFilter extends HashMap<String, String> {
+    public BeaconFilter() {}
+
     /**
      * Constructor that allows a simple filter with only one term to be specified.
      *

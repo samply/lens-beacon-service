@@ -12,6 +12,6 @@ import de.samply.lens_beacon_service.lens.AstNode;
 public class CohortsSexAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, CohortsNameOntologyMaps.genderNameNcit));
+        return(astAndOntologyMapToFilter(astNode, CohortsNameOntologyMaps.genderNameNcit));
     }
 }

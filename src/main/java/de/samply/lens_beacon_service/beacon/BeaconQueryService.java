@@ -63,13 +63,9 @@ public class BeaconQueryService {
         this.siteUrl = siteUrl;
         this.proxyUrl = cleanProxyUrl(proxyUrl);
         this.proxyPort = proxyPort;
+        this.proxyApiKey = proxyApiKey;
         this.query = query;
-        log.info("BeaconQueryService: siteUrl: " + siteUrl);
-        log.info("BeaconQueryService: proxyUrl: " + proxyUrl);
-        log.info("BeaconQueryService: proxyPort: " + proxyPort);
-        log.info("BeaconQueryService: proxyApiKey: " + proxyApiKey);
         if (proxyUrl != null && proxyPort != null) {
-            log.info("BeaconQueryService: setting proxy and API key");
             // Configure proxy settings
             HttpHost proxy = new HttpHost(proxyUrl, Integer.parseInt(proxyPort));
 
@@ -151,7 +147,6 @@ public class BeaconQueryService {
         if (entryType == null)
             return null;
         try {
-            log.info("postQuery: uri: " + entryType.beaconEndpoint.uri);
             if (entryType.beaconEndpoint.method.equals("POST"))
                 return postQuery(entryType.beaconEndpoint.uri, filters);
             else
@@ -215,8 +210,6 @@ public class BeaconQueryService {
         String jsonBeaconRequest = (new BeaconRequest(query.clone(beaconFilters))).toString();
         BeaconResponse beaconResponse = null;
         try {
-            log.info("postQuery: connect to " + siteUrl);
-            log.info("postQuery: proxyUrl: " + proxyUrl + ", proxyPort: " + proxyPort);
             // Create POST request
             HttpPost httpPost = new HttpPost(buildUrl(siteUrl, uri));
 
@@ -238,6 +231,8 @@ public class BeaconQueryService {
 //            // Close the client and release resources
 //            httpClient.close();
         } catch (Exception e) {
+            if (beaconFilters.size() > 0)
+                log.info("postQuery: first filter: " + beaconFilters.get(0).toJson());
             log.info(Utils.traceFromException(e));
          }
 

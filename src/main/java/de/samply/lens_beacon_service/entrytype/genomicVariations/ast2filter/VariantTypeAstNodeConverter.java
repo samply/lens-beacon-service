@@ -12,6 +12,6 @@ import de.samply.lens_beacon_service.lens.AstNode;
 public class VariantTypeAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, GenomicVariationsNameOntologyMaps.variantNameEnsglossary));
+        return(astAndOntologyMapToFilter(astNode, GenomicVariationsNameOntologyMaps.variantNameEnsglossary));
     }
 }

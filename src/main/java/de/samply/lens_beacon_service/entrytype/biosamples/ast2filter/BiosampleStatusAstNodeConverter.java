@@ -14,6 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BiosampleStatusAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconFilter convert(AstNode astNode) {
-        return(convert(astNode, BiosamplesNameOntologyMaps.biosmapleStatusEfo));
+        return(astAndOntologyMapToFilter(astNode, BiosamplesNameOntologyMaps.biosmapleStatusEfo));
     }
 }

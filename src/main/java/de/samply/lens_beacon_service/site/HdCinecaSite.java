@@ -23,6 +23,5 @@ public class HdCinecaSite extends Site {
         entryTypes.add(new DatasetsEntryType("/datasets/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new AnalysesEntryType("/analyses/", "POST")); // Error 380 w/o trailing slash
         entryTypes.add(new GenomicVariationsEntryType("/g_variants/", "POST")); // Error 380 w/o trailing slash
-        log.info("HdCinecaSite: name: " + name);
     }
 }
