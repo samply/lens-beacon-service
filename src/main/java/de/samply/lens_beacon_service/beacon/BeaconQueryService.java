@@ -2,13 +2,12 @@ package de.samply.lens_beacon_service.beacon;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.samply.lens_beacon_service.Utils;
-import de.samply.lens_beacon_service.beacon.model.BeaconFilter;
-import de.samply.lens_beacon_service.beacon.model.BeaconQuery;
-import de.samply.lens_beacon_service.beacon.model.BeaconRequest;
-import de.samply.lens_beacon_service.beacon.model.BeaconResponse;
+import de.samply.lens_beacon_service.util.Utils;
+import de.samply.lens_beacon_service.beacon.model.*;
 import de.samply.lens_beacon_service.entrytype.EntryType;
+import de.samply.lens_beacon_service.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -99,8 +98,10 @@ public class BeaconQueryService {
     public Integer runFilterQueryAtSite(EntryType entryType,
                                         String filterName,
                                         String filterValue) {
-        List<BeaconFilter> localFilters = new ArrayList<BeaconFilter>(entryType.baseFilters); // Clone filters
-        localFilters.add(new BeaconFilter(filterName, filterValue));
+        List<BeaconSearchParameters> localFilters = new ArrayList<BeaconSearchParameters>(entryType.baseFilters); // Clone filters
+        BeaconSearchParameters filter = new BeaconSearchParameters(BeaconSearchParameters.ParameterBlockType.FILTER);
+        filter.addParameter(filterName, filterValue);
+        localFilters.add(filter);
         Integer count = runBeaconEntryTypeQueryAtSite(entryType, localFilters);
 
         return count;
@@ -121,7 +122,7 @@ public class BeaconQueryService {
      * @return
      */
     public Integer runBeaconEntryTypeQueryAtSite(EntryType entryType,
-                                                 List<BeaconFilter> beaconFilters) {
+                                                 List<BeaconSearchParameters> beaconFilters) {
         Integer count = -1;
         try {
             BeaconResponse response = query(entryType, beaconFilters);
@@ -143,7 +144,7 @@ public class BeaconQueryService {
      * @param filters
      * @return
      */
-    private BeaconResponse query(EntryType entryType, List<BeaconFilter> filters) {
+    private BeaconResponse query(EntryType entryType, List<BeaconSearchParameters> filters) {
         if (entryType == null)
             return null;
         try {
@@ -198,20 +199,73 @@ public class BeaconQueryService {
     }
 
     /**
-     * Get a filtered count of objects of a given type know to Beacon.
+     * Extracts filters from a list of BeaconSearchParameters.
      *
+     * @param parametersList The list of BeaconSearchParameters to extract filters from.
+     * @return A new list of BeaconSearchParameters containing only the filter parameters.
+     */
+    private List<BeaconSearchParameters> extractFilters(List<BeaconSearchParameters> parametersList) {
+        List<BeaconSearchParameters> filters = new ArrayList<BeaconSearchParameters>();
+        for (BeaconSearchParameters parameters: parametersList)
+            if (parameters.getType() == BeaconSearchParameters.ParameterBlockType.FILTER)
+                filters.add(parameters);
+
+        return filters;
+    }
+
+    /**
+     * Extracts request parameters from a list of BeaconSearchParameters.
+     *
+     * @param parametersList The list of BeaconSearchParameters to extract request parameters from.
+     * @return A new BeaconSearchParameters object containing the merged request parameters.
+     */
+    private BeaconSearchParameters extractRequestParameters(List<BeaconSearchParameters> parametersList) {
+        BeaconSearchParameters requestParameters = new BeaconSearchParameters(BeaconSearchParameters.ParameterBlockType.REQUEST_PARAMETER);
+        for (BeaconSearchParameters parameters: parametersList)
+            if (parameters.getType() == BeaconSearchParameters.ParameterBlockType.REQUEST_PARAMETER)
+                requestParameters.merge(parameters);
+
+        return requestParameters;
+    }
+
+    /**
+     * Extracts the URI extension from a list of BeaconSearchParameters.
+     *
+     * @param parametersList The list of BeaconSearchParameters to extract the URI extension from.
+     * @return The URI extension as a String, or null if not found.
+     */
+    private String extractUriExtension(List<BeaconSearchParameters> parametersList) {
+        String uriExtension = null;
+        for (BeaconSearchParameters parameters: parametersList)
+            if (parameters.getType() == BeaconSearchParameters.ParameterBlockType.URI_EXTENSION) {
+                uriExtension = parameters.getAnonymousStringParameter();
+                break;
+            }
+
+        return uriExtension;
+    }
+
+    /**
+     * Get a filtered count of objects of a given type know to Beacon.
+     * <p>
      * Use a POST request.
      *
-     * @param uri The URI of the objects be queried, e.g. "individuals" or "cohorts".
-     * @param beaconFilters Filters that will be applied to the query.
+     * @param uri                   The URI of the objects be queried, e.g. "individuals" or "cohorts".
+     * @param searchParameters      Search parameters that will be applied to the query.
      * @return JSON-format list of objects of a given type.
      */
-    private BeaconResponse postQuery(String uri, List<BeaconFilter> beaconFilters) {
-        String jsonBeaconRequest = (new BeaconRequest(query.clone(beaconFilters))).toString();
+    private BeaconResponse postQuery(String uri, List<BeaconSearchParameters> searchParameters) {
+        // Extract filters, requestParameters and the URI extension from
+        // the searchParameters.
+        // Use them to construct the request body that will be sent to Beacon
+        // and work out the final URL that will be employed.
+        String jsonBeaconRequest = (new BeaconRequest(query.clone(extractFilters(searchParameters), extractRequestParameters(searchParameters)))).toString();
+        String uriExtension = extractUriExtension(searchParameters);
+
         BeaconResponse beaconResponse = null;
         try {
             // Create POST request
-            HttpPost httpPost = new HttpPost(buildUrl(siteUrl, uri));
+            HttpPost httpPost = new HttpPost(buildUrl(siteUrl, uri, uriExtension));
 
             // Set JSON request body
             StringEntity entity = new StringEntity(jsonBeaconRequest, ContentType.APPLICATION_JSON);
@@ -219,6 +273,15 @@ public class BeaconQueryService {
 
             // Send the request
             CloseableHttpResponse response = httpClient.execute(httpPost);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode < 200 || statusCode >= 300) {
+                log.error("BeaconQueryService.postQuery: query FAILED, statusCode: " + statusCode);
+                Header locationHeader = response.getFirstHeader("Location");
+                if (locationHeader != null)
+                    log.error("BeaconQueryService.postQuery: Location: " + locationHeader.getValue());
+            }
 
             // Obtain the JSON response
             HttpEntity responseEntity = response.getEntity();
@@ -231,13 +294,24 @@ public class BeaconQueryService {
 //            // Close the client and release resources
 //            httpClient.close();
         } catch (Exception e) {
-            if (beaconFilters.size() > 0)
-                log.info("postQuery: first filter: " + beaconFilters.get(0).toJson());
-            log.info(Utils.traceFromException(e));
+            log.error("postQuery: searchParameters: " + JsonUtils.toJson(searchParameters));
+            log.error(Utils.traceFromException(e));
          }
 
         return beaconResponse;
     }
+
+    private String buildUrl(String siteUrl, String uri, String uriExtension) {
+        String url = buildUrl(siteUrl, uri);
+        if (uriExtension != null) {
+            url = buildUrl(url, uriExtension);
+            if (uri.endsWith("/") && ! url.endsWith("/"))
+                url = url + "/";
+        }
+
+        return url;
+    }
+
 
     private String buildUrl(String siteUrl, String uri) {
         String strippedSiteUrl = siteUrl;

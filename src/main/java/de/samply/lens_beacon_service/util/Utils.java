@@ -1,4 +1,4 @@
-package de.samply.lens_beacon_service;
+package de.samply.lens_beacon_service.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

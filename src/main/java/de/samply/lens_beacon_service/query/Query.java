@@ -30,10 +30,6 @@ public abstract class Query {
         // Get and store the population count. This is always needed.
         Integer count = beaconQueryService.runBeaconEntryTypeQueryAtSite(entryType, entryType.baseFilters);
         entryType.groupAdmin.setCount(count);
-        if (entryType.beaconEndpoint.getEntryType().equals("runs")) {
-            log.info("runQueryAtSite: count: " + count);
-            log.info("group: " + entryType.groupAdmin.group);
-        }
 
         runStratifierQueriesAtSite(beaconQueryService, entryType);
 

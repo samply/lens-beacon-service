@@ -15,7 +15,7 @@ public class IndividualsGroupAdmin extends GroupAdmin {
     private final String STRATIFIER_ETHNICITY = "Ethnicity";
 
     public void init() {
-        super.init("patients");
+        super.init("individuals");
         group.getStratifier().add(createStratifier(STRATIFIER_GENDER));
         group.getStratifier().add(createStratifier(STRATIFIER_ETHNICITY));
     }

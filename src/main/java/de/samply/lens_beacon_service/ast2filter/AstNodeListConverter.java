@@ -1,7 +1,10 @@
 package de.samply.lens_beacon_service.ast2filter;
 
-import de.samply.lens_beacon_service.beacon.model.BeaconFilter;
+import de.samply.lens_beacon_service.beacon.model.BeaconSearchParameters;
+import de.samply.lens_beacon_service.beacon.model.BeaconSearchParameters;
 import de.samply.lens_beacon_service.lens.AstNode;
+import de.samply.lens_beacon_service.util.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +13,18 @@ import java.util.List;
  * Convert a list of AstNode leaf elements into a list of Beacon filters.
  */
 
+@Slf4j
 public abstract class AstNodeListConverter {
     /**
      * Takes an AstNode, representing the root of an AST tree and returns a corresponding
      * list of filters.
      *
      * @param astNode Root node of AST tree.
-     * @return List of BeaconFilter objects.
+     * @return List of BeaconSearchParameters objects.
      */
-    public List<BeaconFilter> convert(AstNode astNode) {
+    public List<BeaconSearchParameters> convert(AstNode astNode) {
         List<AstNode> astNodeLeafNodeList = new AstLeafPicker().crawl(astNode);
+
         return convertFlatAstNodeList(astNodeLeafNodeList);
     }
 
@@ -29,15 +34,16 @@ public abstract class AstNodeListConverter {
      * "flat").
      *
      * @param astNodeLeafNodeList List of AstNode objects.
-     * @return List of BeaconFilter objects.
+     * @return List of BeaconSearchParameters objects.
      */
-    public List<BeaconFilter> convertFlatAstNodeList(List<AstNode> astNodeLeafNodeList) {
-        List<BeaconFilter> beaconFilterList = new ArrayList<BeaconFilter>();
+    public List<BeaconSearchParameters> convertFlatAstNodeList(List<AstNode> astNodeLeafNodeList) {
+        List<BeaconSearchParameters> beaconFilterList = new ArrayList<BeaconSearchParameters>();
         for (AstNode astNode : astNodeLeafNodeList) {
-            BeaconFilter beaconFilter = convertSingleAstNode(astNode);
+            BeaconSearchParameters beaconFilter = convertSingleAstNode(astNode);
             if (beaconFilter != null)
                 beaconFilterList.add(beaconFilter);
         }
+
         return beaconFilterList;
     }
 
@@ -50,5 +56,5 @@ public abstract class AstNodeListConverter {
      * @param astNode Node from AST query.
      * @return single Beacon filter.
      */
-    public abstract BeaconFilter convertSingleAstNode(AstNode astNode);
+    public abstract BeaconSearchParameters convertSingleAstNode(AstNode astNode);
 }

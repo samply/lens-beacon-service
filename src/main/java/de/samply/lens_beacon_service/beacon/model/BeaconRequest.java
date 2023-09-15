@@ -2,7 +2,7 @@ package de.samply.lens_beacon_service.beacon.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.samply.lens_beacon_service.Utils;
+import de.samply.lens_beacon_service.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,7 +28,7 @@ public class BeaconRequest {
     public String toString() {
         String string = "{}";
         try {
-            // AstNodeListConverter the request into JSON, to be sent in the body.
+            // Convert the request into JSON, to be sent in the body.
             string = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
         } catch (JsonProcessingException e) {
             log.error(Utils.traceFromException(e));

@@ -1,7 +1,7 @@
 package de.samply.lens_beacon_service.entrytype.individuals.ast2filter;
 
 import de.samply.lens_beacon_service.ast2filter.AstNodeConverter;
-import de.samply.lens_beacon_service.beacon.model.BeaconFilter;
+import de.samply.lens_beacon_service.beacon.model.BeaconSearchParameters;
 import de.samply.lens_beacon_service.lens.AstNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BmiAstNodeConverter extends AstNodeConverter {
     @Override
-    public BeaconFilter convert(AstNode astNode) {
+    public BeaconSearchParameters convert(AstNode astNode) {
         return(astOperatorAndOntologyToFilter(astNode, "LOINC", "35925-4"));
     }
 }
