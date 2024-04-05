@@ -20,9 +20,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Send queries to the Beacon API. Both GET and POST requests are possible.
@@ -42,12 +46,13 @@ import java.util.List;
 public class BeaconQueryService {
     private BeaconQuery query; // BeaconQuery without filters.
 
-    private String siteUrl; // URL of Beacon 2 site.
+    public String siteUrl; // URL of Beacon 2 site.
 
-    private String proxyUrl;
+    public String proxyUrl;
     private String proxyPort;
     private String proxyApiKey;
     private CloseableHttpClient httpClient;
+    private Map<String,EntryTimings> timings;
 
     /**
      * Set up Beacon querying service.
@@ -78,6 +83,8 @@ public class BeaconQueryService {
             httpClient = HttpClients
                     .custom()
                     .build();
+
+        timings  = new HashMap<String,EntryTimings>();
     }
 
     private String createProxyApiKeyString(String proxyApiKey) {
@@ -123,6 +130,9 @@ public class BeaconQueryService {
      */
     public Integer runBeaconEntryTypeQueryAtSite(EntryType entryType,
                                                  List<BeaconSearchParameters> beaconFilters) {
+        if (entryType == null)
+            log.warn("runQuery: entryType == null");
+
         Integer count = -1;
         try {
             BeaconResponse response = query(entryType, beaconFilters);
@@ -131,6 +141,7 @@ public class BeaconQueryService {
         } catch (Exception e) {
             log.error("runQuery: problem with " + entryType.beaconEndpoint.getEntryType() + ", trace: " + Utils.traceFromException(e));
         }
+
         return count;
     }
 
@@ -142,11 +153,13 @@ public class BeaconQueryService {
      *
      * @param entryType
      * @param filters
-     * @return
+     * @return Deserialized response to query. Return null if something goes wrong.
      */
     private BeaconResponse query(EntryType entryType, List<BeaconSearchParameters> filters) {
-        if (entryType == null)
+        if (entryType == null) {
+            log.warn("entryType == null");
             return null;
+        }
         try {
             if (entryType.beaconEndpoint.method.equals("POST"))
                 return postQuery(entryType.beaconEndpoint.uri, filters);
@@ -264,11 +277,13 @@ public class BeaconQueryService {
 
         BeaconResponse beaconResponse = null;
         try {
+            String url = buildUrl(siteUrl, uri, uriExtension);
+            StringEntity entity = new StringEntity(jsonBeaconRequest, ContentType.APPLICATION_JSON);
+
             // Create POST request
-            HttpPost httpPost = new HttpPost(buildUrl(siteUrl, uri, uriExtension));
+            HttpPost httpPost = new HttpPost(url);
 
             // Set JSON request body
-            StringEntity entity = new StringEntity(jsonBeaconRequest, ContentType.APPLICATION_JSON);
             httpPost.setEntity(entity);
 
             // Send the request
@@ -278,6 +293,7 @@ public class BeaconQueryService {
 
             if (statusCode < 200 || statusCode >= 300) {
                 log.error("BeaconQueryService.postQuery: query FAILED, statusCode: " + statusCode);
+                log.error("BeaconQueryService.postQuery: jsonBeaconRequest: " + jsonBeaconRequest);
                 Header locationHeader = response.getFirstHeader("Location");
                 if (locationHeader != null)
                     log.error("BeaconQueryService.postQuery: Location: " + locationHeader.getValue());
@@ -294,11 +310,41 @@ public class BeaconQueryService {
 //            // Close the client and release resources
 //            httpClient.close();
         } catch (Exception e) {
+            log.error("postQuery: error running query");
             log.error("postQuery: searchParameters: " + JsonUtils.toJson(searchParameters));
-            log.error(Utils.traceFromException(e));
+            //log.error(Utils.traceFromException(e));
+            String[] error = Utils.traceFromException(e).split("\n");
+            if (error.length > 0)
+                log.error("postQuery: error[0]: " + error[0]);
+            if (error.length > 1)
+                log.error("postQuery: error[1]: " + error[1]);
          }
 
         return beaconResponse;
+    }
+
+    private CloseableHttpResponse executeAtClient(String url, StringEntity entity, int count) throws IOException {
+        // Create POST request
+        HttpPost httpPost = new HttpPost(url);
+
+        // Set JSON request body
+        httpPost.setEntity(entity);
+
+        // Send the request
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        if (statusCode == 404 && count > 0) {
+            try {
+                //Thread.sleep(10);
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            return executeAtClient(url, entity, count - 1);
+        } else
+            return response;
     }
 
     private String buildUrl(String siteUrl, String uri, String uriExtension) {
@@ -341,5 +387,41 @@ public class BeaconQueryService {
             cleanProxyUrl = cleanProxyUrl.substring(8, cleanProxyUrl.length());
 
         return cleanProxyUrl;
+    }
+
+    EntryTimings getEntryTimings(String entryType) {
+        if (timings.containsKey(entryType))
+            return timings.get(entryType);
+        else {
+            EntryTimings entryTimings = new EntryTimings();
+            entryTimings.entryType = entryType;
+            timings.put(entryType, entryTimings);
+            return entryTimings;
+        }
+    }
+
+    public void setQueryTiming(String entryType, Integer queryTiming) {
+        if (queryTiming < 0)
+            log.warn("queryTiming is negative for entryType: " + entryType);
+        EntryTimings entryTimings = getEntryTimings(entryType);
+        entryTimings.queryTiming = queryTiming;
+    }
+
+    public void setStratifierTiming(String entryType, String stratifierName, Integer stratifierCount, Integer stratifierTiming) {
+        EntryTimings entryTimings = getEntryTimings(entryType);
+        List<Integer> stratifierInfo = entryTimings.getStratifierInfo(stratifierName);
+        stratifierInfo.add(stratifierCount);
+        stratifierInfo.add(stratifierTiming);
+    }
+
+    public void showTimings() {
+        log.info("");
+        log.info("TIMINGS for " + siteUrl);
+        for (String entryType: timings.keySet())
+            getEntryTimings(entryType).showTimings();
+    }
+
+    public Map<String,EntryTimings> getTimings() {
+        return timings;
     }
 }

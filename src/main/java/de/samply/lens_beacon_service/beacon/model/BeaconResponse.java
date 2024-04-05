@@ -41,8 +41,6 @@ public class BeaconResponse {
             }
         }
 
-        log.info("Numerical response returned by Beacon");
-
         // We have a results count, so cast it to Integer and return it.
         return (Integer) this.responseSummary.get("numTotalResults");
     }

@@ -16,8 +16,8 @@ public class BiosamplesQuery extends Query {
      */
     public void runStratifierQueriesAtSite(BeaconQueryService beaconQueryService, EntryType entryType) {
         Map<String, Integer> counts;
-        // Runs the query for the gender stratifier.
-        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, BiosamplesNameOntologyMaps.biosmapleTypeUberon);
+        // Runs the query for the sample type stratifier.
+        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, BiosamplesNameOntologyMaps.biosmapleTypeUberon, "sample_kind");
         ((BiosamplesGroupAdmin)entryType.groupAdmin).setBiosampleTypeCounts(counts);
     }
 }

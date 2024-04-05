@@ -17,11 +17,15 @@ public class IndividualsQuery extends Query {
     public void runStratifierQueriesAtSite(BeaconQueryService beaconQueryService, EntryType entryType) {
         Map<String, Integer> counts;
         // Runs the query for the gender stratifier.
-        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, IndividualsNameOntologyMaps.genderNameNcit);
+        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, IndividualsNameOntologyMaps.genderNameNcit, "Gender");
         ((IndividualsGroupAdmin)entryType.groupAdmin).setGenderCounts(counts);
 
         // Runs the query for the ethnicity stratifier.
-        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, IndividualsNameOntologyMaps.ethnicityNameNcit);
+        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, IndividualsNameOntologyMaps.ethnicityNameNcit, "Ethnicity");
         ((IndividualsGroupAdmin)entryType.groupAdmin).setEthnicityCounts(counts);
+
+//        // Runs the query for the treatment stratifier.
+//        counts =  runStratifierQueryAtSite(beaconQueryService, entryType, IndividualsNameOntologyMaps.treatmentOpcsCode, "Treatment");
+//        ((IndividualsGroupAdmin)entryType.groupAdmin).setTreatmentCounts(counts);
     }
 }

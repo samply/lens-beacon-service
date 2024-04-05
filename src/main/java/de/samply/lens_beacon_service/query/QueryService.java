@@ -1,7 +1,6 @@
 package de.samply.lens_beacon_service.query;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import de.samply.lens_beacon_service.beacon.EntryTimings;
 import de.samply.lens_beacon_service.site.Site;
 import de.samply.lens_beacon_service.entrytype.EntryType;
 import de.samply.lens_beacon_service.site.Sites;
@@ -9,9 +8,11 @@ import de.samply.lens_beacon_service.lens.AstNode;
 import de.samply.lens_beacon_service.lens.SiteResult;
 import de.samply.lens_beacon_service.measurereport.MeasureReportAdmin;
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.MeasureReport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is the bridge between the Lens and the Beacon worlds.
@@ -35,12 +36,6 @@ public class QueryService {
      * @return Serialized results.
      */
     public String runQuery(AstNode astNode) {
-        try {
-            log.info("\nastNode: " + new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(astNode));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
         // Create a fresh list of known Beacon sites.
         List<Site> sites = Sites.getSites();
 
@@ -64,14 +59,56 @@ public class QueryService {
             MeasureReportAdmin measureReportAdmin = new MeasureReportAdmin();
 
             for (EntryType entryType: site.entryTypes) {
-                log.info("runQuery: entryType: "+ entryType.beaconEndpoint.getEntryType());
-                measureReportAdmin.measureReport.addGroup(entryType.query.runQueryAtSite(site.beaconQueryService, entryType));
+                String entryTypeName = entryType.beaconEndpoint.getEntryType();
+                MeasureReport.MeasureReportGroupComponent group = entryType.query.runQueryAtSite(site.beaconQueryService, entryType);
+                measureReportAdmin.measureReport.addGroup(group);
             }
 
             String jsonMeasure = measureReportAdmin.toString();
             jsonResults = jsonResults.replaceAll("\"PLACEHOLDER" + site.name + "\"", "\n" + jsonMeasure.replaceAll("^", "        "));
         }
 
+        showTimings(sites);
+
         return jsonResults;
+    }
+
+    private void showTimings(List<Site> sites) {
+        EntryTimings totalEntryTimings = new EntryTimings();
+        totalEntryTimings.queryTiming = 0;
+        totalEntryTimings.queryTimingCount = 0;
+        // Loop over sites
+        for (Site site: sites) {
+            site.beaconQueryService.showTimings();
+            Map<String, EntryTimings> timings = site.beaconQueryService.getTimings();
+            // Loop over Beacon endpoints
+            for (String entryType: timings.keySet()) {
+                EntryTimings entryTimings = timings.get(entryType);
+
+                // Did this end point return a valid timing?
+                if (entryTimings.queryTiming >= 0) {
+                    totalEntryTimings.queryTiming += entryTimings.queryTiming;
+                    totalEntryTimings.queryTimingCount++;
+
+                    // Loop over stratifiers
+                    for (String stratifierName: entryTimings.stratifierTimings.keySet()) {
+                        List<Integer> stratifierInfo = entryTimings.getStratifierInfo(stratifierName);
+                        List<Integer> totalStratifierInfo = totalEntryTimings.getStratifierInfo(stratifierName);
+                        if (totalStratifierInfo.size() == 0) {
+                            totalStratifierInfo.add(0);
+                            totalStratifierInfo.add(0);
+                            totalStratifierInfo.add(0);
+                        }
+                        totalStratifierInfo.set(0, stratifierInfo.get(0)); // value count, should always be the same
+                        totalStratifierInfo.set(1, totalStratifierInfo.get(1) + stratifierInfo.get(1)); // timing
+                        totalStratifierInfo.set(2, totalStratifierInfo.get(2) + 1); // stratifier count
+                    }
+                }
+            }
+        }
+
+        log.info("TOTALS:");
+        log.info(":");
+        totalEntryTimings.showTimings();
     }
 }

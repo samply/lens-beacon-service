@@ -13,11 +13,13 @@ import java.util.Map;
 public class IndividualsGroupAdmin extends GroupAdmin {
     private final String STRATIFIER_GENDER = "Gender";
     private final String STRATIFIER_ETHNICITY = "Ethnicity";
+    private final String STRATIFIER_TREATMENT = "Treatment";
 
     public void init() {
         super.init("individuals");
         group.getStratifier().add(createStratifier(STRATIFIER_GENDER));
         group.getStratifier().add(createStratifier(STRATIFIER_ETHNICITY));
+        group.getStratifier().add(createStratifier(STRATIFIER_TREATMENT));
     }
 
     /**
@@ -37,4 +39,13 @@ public class IndividualsGroupAdmin extends GroupAdmin {
     public void setEthnicityCounts(Map<String, Integer> counts) {
         setStratifierCounts(counts, STRATIFIER_ETHNICITY);
     }
+
+//    /**
+//     * Add counts to the treatment stratifier.
+//     *
+//     * @param counts
+//     */
+//    public void setTreatmentCounts(Map<String, Integer> counts) {
+//        setStratifierCounts(counts, STRATIFIER_TREATMENT);
+//    }
 }
