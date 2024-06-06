@@ -17,11 +17,11 @@ public class GdiStarterKitSite extends Site {
         url = "http://beacon:5050/api";
         query = new GranularityLcBeaconQuery();
         entryTypes.add(new IndividualsEntryType());
-        entryTypes.add(new BiosamplesEntryType());
-        entryTypes.add(new CohortsEntryType());
-        entryTypes.add(new RunsEntryType());
-        entryTypes.add(new DatasetsEntryType());
-        entryTypes.add(new AnalysesEntryType());
-        entryTypes.add(new GenomicVariationsEntryType());
+        //entryTypes.add(new BiosamplesEntryType());
+        //entryTypes.add(new CohortsEntryType());
+        //entryTypes.add(new RunsEntryType());
+        //entryTypes.add(new DatasetsEntryType());
+        //entryTypes.add(new AnalysesEntryType());
+        //entryTypes.add(new GenomicVariationsEntryType());
     }
 }

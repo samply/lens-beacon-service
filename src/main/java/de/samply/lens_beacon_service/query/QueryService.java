@@ -1,6 +1,7 @@
 package de.samply.lens_beacon_service.query;
 
 import de.samply.lens_beacon_service.beacon.EntryTimings;
+import de.samply.lens_beacon_service.beacon.MultiRunSiteTimings;
 import de.samply.lens_beacon_service.site.Site;
 import de.samply.lens_beacon_service.entrytype.EntryType;
 import de.samply.lens_beacon_service.site.Sites;
@@ -35,7 +36,7 @@ public class QueryService {
      * @param astNode AST query.
      * @return Serialized results.
      */
-    public String runQuery(AstNode astNode) {
+    public String runQuery(AstNode astNode, MultiRunSiteTimings multiRunSiteTimings) {
         // Create a fresh list of known Beacon sites.
         List<Site> sites = Sites.getSites();
 
@@ -68,40 +69,42 @@ public class QueryService {
             jsonResults = jsonResults.replaceAll("\"PLACEHOLDER" + site.name + "\"", "\n" + jsonMeasure.replaceAll("^", "        "));
         }
 
-        showTimings(sites);
+        showTimings(sites, multiRunSiteTimings);
 
         return jsonResults;
     }
 
-    private void showTimings(List<Site> sites) {
+    /**
+     * Calculates and prints out the total timings for the given list of sites.
+     * <p>
+     * Iterates over each site, retrieves the timings for each beacon endpoint, and accumulates the total timings.
+     * Additionally, calculates and logs the total stratifier timings for each beacon endpoint.
+     *
+     * @param sites                 The list of sites to calculate and print the timings for.
+     * @param multiRunSiteTimings
+     */
+    private void showTimings(List<Site> sites, MultiRunSiteTimings multiRunSiteTimings) {
         EntryTimings totalEntryTimings = new EntryTimings();
-        totalEntryTimings.queryTiming = 0;
-        totalEntryTimings.queryTimingCount = 0;
         // Loop over sites
         for (Site site: sites) {
-            site.beaconQueryService.showTimings();
+            log.info("");
+            log.info("Site name: " + site.name);
+            List<EntryTimings.TotalSumPair> siteTimings = site.beaconQueryService.showTimings();
+            multiRunSiteTimings.add(site.name, siteTimings); // save for stats analysis
             Map<String, EntryTimings> timings = site.beaconQueryService.getTimings();
             // Loop over Beacon endpoints
             for (String entryType: timings.keySet()) {
                 EntryTimings entryTimings = timings.get(entryType);
 
                 // Did this end point return a valid timing?
-                if (entryTimings.queryTiming >= 0) {
-                    totalEntryTimings.queryTiming += entryTimings.queryTiming;
-                    totalEntryTimings.queryTimingCount++;
+                if (entryTimings.getQueryTiming() >= 0) {
+                    totalEntryTimings.addQueryTiming(entryTimings.getQueryTiming());
 
                     // Loop over stratifiers
-                    for (String stratifierName: entryTimings.stratifierTimings.keySet()) {
-                        List<Integer> stratifierInfo = entryTimings.getStratifierInfo(stratifierName);
-                        List<Integer> totalStratifierInfo = totalEntryTimings.getStratifierInfo(stratifierName);
-                        if (totalStratifierInfo.size() == 0) {
-                            totalStratifierInfo.add(0);
-                            totalStratifierInfo.add(0);
-                            totalStratifierInfo.add(0);
-                        }
-                        totalStratifierInfo.set(0, stratifierInfo.get(0)); // value count, should always be the same
-                        totalStratifierInfo.set(1, totalStratifierInfo.get(1) + stratifierInfo.get(1)); // timing
-                        totalStratifierInfo.set(2, totalStratifierInfo.get(2) + 1); // stratifier count
+                    for (String stratifierName: entryTimings.getStratifierNames()) {
+                        EntryTimings.TotalSumPair stratifierInfo = entryTimings.getStratifierInfo(stratifierName);
+                        EntryTimings.TotalSumPair totalStratifierInfo = totalEntryTimings.getStratifierInfo(stratifierName);
+                        totalStratifierInfo.add(stratifierInfo);
                     }
                 }
             }

@@ -26,11 +26,11 @@ public class GdiStarterKitBeamConnectSite extends Site {
         proxyPort = GlobalVariables.configuration.getProxyPort();
         proxyApiKey = GlobalVariables.configuration.getProxyApiKey();
         entryTypes.add(new IndividualsEntryType());
-        entryTypes.add(new BiosamplesEntryType());
-        entryTypes.add(new CohortsEntryType());
-        entryTypes.add(new RunsEntryType());
-        entryTypes.add(new DatasetsEntryType());
-        entryTypes.add(new AnalysesEntryType());
-        entryTypes.add(new GenomicVariationsEntryType());
+        //entryTypes.add(new BiosamplesEntryType());
+        //entryTypes.add(new CohortsEntryType());
+        //entryTypes.add(new RunsEntryType());
+        //entryTypes.add(new DatasetsEntryType());
+        //entryTypes.add(new AnalysesEntryType());
+        //entryTypes.add(new GenomicVariationsEntryType());
     }
 }

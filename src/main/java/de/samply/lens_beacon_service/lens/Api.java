@@ -1,5 +1,6 @@
 package de.samply.lens_beacon_service.lens;
 
+import de.samply.lens_beacon_service.beacon.MultiRunSiteTimings;
 import de.samply.lens_beacon_service.query.QueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -13,6 +14,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
@@ -60,7 +64,13 @@ public class Api {
           .build();
     }
     try {
-      String jsonResult = queryService.runQuery(astNode);
+      MultiRunSiteTimings multiRunSiteTimings = new MultiRunSiteTimings();
+      String jsonResult = queryService.runQuery(astNode, multiRunSiteTimings);
+//      // Test to see what happens when we do multiple runs
+//      for (int i = 0; i < 19; i++)
+//          jsonResult = queryService.runQuery(astNode, multiRunSiteTimings);
+
+      multiRunSiteTimings.showTimings();
 
       return addCorsHeaders(Response.ok(jsonResult)).header("Access-Control-Expose-Headers", "Location").build();
     } catch (Exception e) {

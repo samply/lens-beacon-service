@@ -52,6 +52,10 @@ public class BeaconQueryService {
     private String proxyPort;
     private String proxyApiKey;
     private CloseableHttpClient httpClient;
+
+    // Keep track of query timings. The key is the entry type (Beacon endpoint).
+    // The value is an EntryTimings object, that is used to store the timing of
+    // the primary query and the stratifiers.
     private Map<String,EntryTimings> timings;
 
     /**
@@ -84,6 +88,7 @@ public class BeaconQueryService {
                     .custom()
                     .build();
 
+        // Initialize query timings.
         timings  = new HashMap<String,EntryTimings>();
     }
 
@@ -389,38 +394,90 @@ public class BeaconQueryService {
         return cleanProxyUrl;
     }
 
+    /**
+     * Retrieves the EntryTimings object for the given entry type. This object is used for storing
+     * diverse information about timings, e.g. query timing, stratifier timings, etc.
+     *
+     * If the entry type is already present in the timings map, returns the corresponding EntryTimings object.
+     * Otherwise, creates a new EntryTimings object, adds it to the timings map, and returns it.
+     *
+     * @param entryType The entry type for which to retrieve the EntryTimings object.
+     * @return The EntryTimings object associated with the given entry type.
+     */
     EntryTimings getEntryTimings(String entryType) {
         if (timings.containsKey(entryType))
             return timings.get(entryType);
         else {
             EntryTimings entryTimings = new EntryTimings();
-            entryTimings.entryType = entryType;
+            entryTimings.setEntryType(entryType);
             timings.put(entryType, entryTimings);
             return entryTimings;
         }
     }
 
+    /**
+     * Sets the query timing for the specified entry type. This is the timing associated with the
+     * primary result of the query, i.e. the count (e.g. of patients).
+     *
+     * If the query timing is negative, logs a warning.
+     *
+     * @param entryType The entry type for which to set the query timing.
+     * @param queryTiming The query timing value.
+     */
     public void setQueryTiming(String entryType, Integer queryTiming) {
         if (queryTiming < 0)
             log.warn("queryTiming is negative for entryType: " + entryType);
         EntryTimings entryTimings = getEntryTimings(entryType);
-        entryTimings.queryTiming = queryTiming;
+        entryTimings.addQueryTiming(queryTiming);
     }
 
-    public void setStratifierTiming(String entryType, String stratifierName, Integer stratifierCount, Integer stratifierTiming) {
+    /**
+     * Adds the stratifier count and timing to the corresponding EntryTimings object
+     * in the timings map.
+     *
+     * @param entryType The entry type for which to set the stratifier timing.
+     * @param stratifierName The name of the stratifier.
+     * @param stratifierCount The stratifier count value.
+     * @param stratifierTiming The stratifier timing value.
+     */
+    public void setStratifierTimings(String entryType, String stratifierName, Integer stratifierCount, Integer stratifierTiming) {
         EntryTimings entryTimings = getEntryTimings(entryType);
-        List<Integer> stratifierInfo = entryTimings.getStratifierInfo(stratifierName);
-        stratifierInfo.add(stratifierCount);
-        stratifierInfo.add(stratifierTiming);
+        EntryTimings.TotalSumPair totalSumPair = entryTimings.getStratifierInfo(stratifierName);
+        totalSumPair.add(stratifierCount, stratifierTiming);
     }
 
-    public void showTimings() {
-        log.info("");
+    public void setStratifierTiming(String entryType, Integer stratifierTiming) {
+        EntryTimings entryTimings = getEntryTimings(entryType);
+        //entryTimings.addTiming(stratifierTiming);
+    }
+
+    /**
+     * Prints out the timings for each entry type in the timings map.
+     *
+     * @return cumulative timings for all entry types running on this service.
+     */
+    public List<EntryTimings.TotalSumPair> showTimings() {
         log.info("TIMINGS for " + siteUrl);
-        for (String entryType: timings.keySet())
-            getEntryTimings(entryType).showTimings();
+        EntryTimings.TotalSumPair cumulativeSumPair = new EntryTimings.TotalSumPair();
+        List<EntryTimings.TotalSumPair> cumulativeSumPairs = new ArrayList<EntryTimings.TotalSumPair>();
+        for (String entryType: timings.keySet()) {
+            EntryTimings entryTimings = getEntryTimings(entryType);
+            entryTimings.showTimings();
+            EntryTimings.TotalSumPair sumPair = entryTimings.calculateOverallTiming();
+            cumulativeSumPair.add(sumPair);
+            cumulativeSumPairs.addAll(entryTimings.getOverallTimings());
+        }
+        log.info("    CUMULATIVE MEAN TIMING: " + cumulativeSumPair.getMean() + " ms");
+        log.info("    CUMULATIVE VALUE COUNT: " + cumulativeSumPairs.size());
+
+        return cumulativeSumPairs;
     }
 
+    /**
+     * Returns the map of entry types to EntryTimings objects.
+     *
+     * @return The map of entry types to EntryTimings objects.
+     */
     public Map<String,EntryTimings> getTimings() {
         return timings;
     }

@@ -47,6 +47,5 @@ public class EntryType {
             baseFilters = astNodeListConverter.convert(astNode);
             baseRequestParameters = new BeaconSearchParameters(BeaconSearchParameters.ParameterBlockType.REQUEST_PARAMETER); // TODO: pull this out of the nmode list as well
         }
-        log.info("EntryType.convert: baseFilters:\n\n" + JsonUtils.toJson(baseFilters));
     }
 }

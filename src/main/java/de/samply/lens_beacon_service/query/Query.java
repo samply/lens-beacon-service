@@ -27,31 +27,33 @@ public abstract class Query {
      * @return The measure report group where the query results were stored.
      */
     public MeasureReport.MeasureReportGroupComponent runQueryAtSite(BeaconQueryService beaconQueryService, EntryType entryType) {
-        long startTime = System.currentTimeMillis(); // Capture start time
-
-        // Get and store the population count. This is always needed.
-        Integer count = beaconQueryService.runBeaconEntryTypeQueryAtSite(entryType, entryType.baseFilters);
-
-        long endTime = System.currentTimeMillis(); // Capture end time
-        long elapsedTime = endTime - startTime; // Calculate elapsed time
-        log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ entry type: " + entryType.beaconEndpoint.getEntryType());
-        log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ query execution time (ms): " + elapsedTime);
-        if (elapsedTime < 0)
-            log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ elapsed time less than 0");
-        if (count >= 0) {
-            log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ INT query execution time (ms): " + (int) elapsedTime);
-            beaconQueryService.setQueryTiming(entryType.beaconEndpoint.getEntryType(), (int) elapsedTime);
-        }
-        log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ siteUrl: " + beaconQueryService.siteUrl);
-        log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ proxyUrl: " + beaconQueryService.proxyUrl);
-        log.info("runQueryAtSite: QQQQQQQQQQQQZZZZZZZZZZZQQQQQQQQQQ count: " + count);
-        entryType.groupAdmin.setCount(count);
+        int count = runCountQueryAtSite(beaconQueryService, entryType);
+        // For testing: run runCountQueryAtSite multiple times
+        for (int i = 0; i < 999; i++)
+            count = runCountQueryAtSite(beaconQueryService, entryType);
 
         // Only run stratifiers if main query was able to return a sensible value.
         if (count >= 0)
             runStratifierQueriesAtSite(beaconQueryService, entryType);
 
         return entryType.groupAdmin.group;
+    }
+
+    private int runCountQueryAtSite(BeaconQueryService beaconQueryService, EntryType entryType) {
+        long startTime = System.currentTimeMillis(); // Capture query start time
+
+        // Get and store the population count. This is always needed.
+        Integer count = beaconQueryService.runBeaconEntryTypeQueryAtSite(entryType, entryType.baseFilters);
+
+        long endTime = System.currentTimeMillis(); // Capture query end time
+        long elapsedTime = endTime - startTime; // Calculate elapsed time
+        if (elapsedTime < 0)
+            log.warn("runQueryAtSite: elapsed time less than 0");
+        if (count >= 0)
+            beaconQueryService.setQueryTiming(entryType.beaconEndpoint.getEntryType(), (int) elapsedTime);
+        entryType.groupAdmin.setCount(count);
+
+        return count;
     }
 
     /**
@@ -70,7 +72,12 @@ public abstract class Query {
         Map<String, Integer> counts = new HashMap<String, Integer>();
         boolean positiveCountFlag = false;
         for (String name : nameOntologyMap.keySet()) {
+            long innerStartTime = System.currentTimeMillis(); // Capture start time
             Integer count = beaconQueryService.runFilterQueryAtSite(entryType,"id", nameOntologyMap.get(name));
+            long innerEndTime = System.currentTimeMillis(); // Capture end time
+            long innerElapsedTime = innerEndTime - innerStartTime; // Calculate elapsed time
+            beaconQueryService.setStratifierTiming(entryType.beaconEndpoint.getEntryType(), (int) innerElapsedTime);
+
             if (count >= 0)
                 positiveCountFlag = true;
             counts.put(name, count);
@@ -80,7 +87,7 @@ public abstract class Query {
         long elapsedTime = endTime - startTime; // Calculate elapsed time
 
         if (positiveCountFlag)
-            beaconQueryService.setStratifierTiming(entryType.beaconEndpoint.getEntryType(), stratifierName, nameOntologyMap.keySet().size(), (int) elapsedTime);
+            beaconQueryService.setStratifierTimings(entryType.beaconEndpoint.getEntryType(), stratifierName, nameOntologyMap.keySet().size(), (int) elapsedTime);
 
         return counts;
     }
