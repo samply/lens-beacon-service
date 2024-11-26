@@ -2,3 +2,5 @@ proxy:
   url: "lensbeacon-beam-connect"
   port: "8062"
   apikey: ${PROXY_API_KEY}
+stats:
+  maxQueryRepeats: ${MAX_QUERY_REPEATS:1}

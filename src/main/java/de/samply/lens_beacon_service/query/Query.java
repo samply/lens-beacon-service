@@ -1,5 +1,6 @@
 package de.samply.lens_beacon_service.query;
 
+import de.samply.lens_beacon_service.GlobalVariables;
 import de.samply.lens_beacon_service.beacon.BeaconQueryService;
 import de.samply.lens_beacon_service.entrytype.EntryType;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,14 @@ public abstract class Query {
      * @return The measure report group where the query results were stored.
      */
     public MeasureReport.MeasureReportGroupComponent runQueryAtSite(BeaconQueryService beaconQueryService, EntryType entryType) {
-        int count = runCountQueryAtSite(beaconQueryService, entryType);
-        // For testing: run runCountQueryAtSite multiple times
-        for (int i = 0; i < 999; i++)
+        int statsMaxQueryRepeats = Integer.parseInt(GlobalVariables.configuration.getStatsMaxQueryRepeats());
+        if (statsMaxQueryRepeats < 1)
+            log.warn("runQueryAtSite: statsMaxQueryRepeats less than 1, no queries will be run.");
+        if (statsMaxQueryRepeats > 1)
+            log.info("runQueryAtSite: running statistical comparisons, statsMaxQueryRepeats: " + statsMaxQueryRepeats);
+        int count = 0;
+        // For statistical analyses: run runCountQueryAtSite multiple times
+        for (int i = 0; i < statsMaxQueryRepeats; i++)
             count = runCountQueryAtSite(beaconQueryService, entryType);
 
         // Only run stratifiers if main query was able to return a sensible value.

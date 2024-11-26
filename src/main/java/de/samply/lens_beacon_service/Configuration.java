@@ -16,4 +16,7 @@ public class Configuration {
 
     @Value("${proxy.apikey}")
     private String proxyApiKey;
+
+    @Value("${stats.maxQueryRepeats}")
+    private String statsMaxQueryRepeats;
 }
