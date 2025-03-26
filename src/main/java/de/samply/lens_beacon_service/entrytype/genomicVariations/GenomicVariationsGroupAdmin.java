@@ -2,11 +2,16 @@ package de.samply.lens_beacon_service.entrytype.genomicVariations;
 
 import de.samply.lens_beacon_service.measurereport.GroupAdmin;
 
+import java.util.Map;
+
 /**
  * Generate the genomicVariations group for the measure report.
  */
 
 public class GenomicVariationsGroupAdmin extends GroupAdmin {
+    private final String STRATIFIER_VARIANT_NAME = "variant_name";
+
+
     /**
      * Generate group with all counts set to default initial values.
      *
@@ -14,7 +19,15 @@ public class GenomicVariationsGroupAdmin extends GroupAdmin {
      */
     public void init() {
         super.init("variants"); // Measure report name used in GUI
-        // Lens seems to like to have at least one stratifier, even if it is unused.
-        group.getStratifier().add(createNullStratifier());
+        group.getStratifier().add(createStratifier(STRATIFIER_VARIANT_NAME));
+    }
+
+    /**
+     * Set the counts for the various variant types known to Beam.
+     *
+     * @param counts
+     */
+    public void setVariantNameCounts(Map<String, Integer> counts) {
+        setStratifierCounts(counts, STRATIFIER_VARIANT_NAME);
     }
 }

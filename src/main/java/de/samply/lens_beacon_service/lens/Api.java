@@ -15,9 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
@@ -57,13 +54,14 @@ public class Api {
           description = "Structured query and the target as a query container object.",
           schema = @Schema(implementation = AstNode.class))
       AstNode astNode) {
-    log.info("postAstQuery: entered");
     if (astNode == null) {
+      log.error("postAstQuery: astNode == null");
       return Response.status(BAD_REQUEST)
           .entity("Missing payload. Expected a query container encoded in JSON.")
           .build();
     }
     try {
+      log.info("postAstQuery: run query");
       MultiRunSiteTimings multiRunSiteTimings = new MultiRunSiteTimings();
       String jsonResult = queryService.runQuery(astNode, multiRunSiteTimings);
 //      // Test to see what happens when we do multiple runs
@@ -71,6 +69,7 @@ public class Api {
 //          jsonResult = queryService.runQuery(astNode, multiRunSiteTimings);
 
       multiRunSiteTimings.showTimings();
+      log.info("postAstQuery: done");
 
       return addCorsHeaders(Response.ok(jsonResult)).header("Access-Control-Expose-Headers", "Location").build();
     } catch (Exception e) {
@@ -93,20 +92,15 @@ public class Api {
   })
   @Operation(summary = "Preflight OPTIONS for CORS for individuals count query")
   public Response optionsAstQuery() {
-    return createPreflightCorsResponse(HttpMethod.POST, "Origin, Accept, Content-Type");
+    return Response.noContent().build();
   }
 
   private Response.ResponseBuilder addCorsHeaders(Response.ResponseBuilder builder) {
     return builder
         .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS") // Allow required methods
+        .header("Access-Control-Allow-Headers", "Origin, Accept, Content-Type, Authorization, X-Requested-With")
+        .header("Access-Control-Allow-Credentials", "true") // Allow credentials if needed
         .header("Cache-Control", "no-cache");
-  }
-
-  private Response createPreflightCorsResponse(String allowedMethod, String allowedHeaders) {
-    return Response.noContent()
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Methods", allowedMethod)
-        .header("Access-Control-Allow-Headers", allowedHeaders)
-        .build();
   }
 }

@@ -10,6 +10,15 @@ import java.util.List;
 @Slf4j
 public class StatisticalComparison {
     public void compareDistributions(List<EntryTimings.TotalSumPair> dist1, List<EntryTimings.TotalSumPair> dist2) {
+        if (dist1.size() == 0) {
+            log.info("compareDistributions: No data in dist1");
+            return;
+        }
+        if (dist2.size() == 0) {
+            log.info("compareDistributions: No data in dist2");
+            return;
+        }
+
         double[] data1 = convertToDouble(dist1);
         double[] data2 = convertToDouble(dist2);
 
