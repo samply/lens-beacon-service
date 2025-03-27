@@ -92,7 +92,7 @@ public class Api {
   })
   @Operation(summary = "Preflight OPTIONS for CORS for individuals count query")
   public Response optionsAstQuery() {
-    return Response.noContent().build();
+    return addCorsHeaders(Response.noContent()).build();
   }
 
   private Response.ResponseBuilder addCorsHeaders(Response.ResponseBuilder builder) {
