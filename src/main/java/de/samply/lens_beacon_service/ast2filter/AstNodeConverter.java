@@ -27,6 +27,19 @@ public abstract class AstNodeConverter {
     public abstract BeaconSearchParameters convert(AstNode astNode);
 
     protected BeaconSearchParameters astAndOntologyMapToFilter(AstNode astNode, Map<String, String> nameOntologyMap) {
+        if (astNode == null) {
+            log.warn("astAndOntologyMapToFilter: astNode is null");
+            return null;
+        }
+        if (astNode.value == null) {
+            log.warn("astAndOntologyMapToFilter: astNode.value is null");
+            return null;
+        }
+        if (!(astNode.value instanceof List)) {
+            log.warn("astAndOntologyMapToFilter: astNode.value is not a List");
+            log.warn("astAndOntologyMapToFilter: astNode.value: " + astNode.value.toString());
+            return null;
+        }
         String ontologyDefinition = nameOntologyMap.get(((List) astNode.value).get(0));
         BeaconSearchParameters filter = new BeaconSearchParameters(BeaconSearchParameters.ParameterBlockType.FILTER);
         filter.addParameter("id", ontologyDefinition);
