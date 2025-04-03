@@ -299,6 +299,7 @@ public class BeaconQueryService {
             if (statusCode < 200 || statusCode >= 300) {
                 log.error("BeaconQueryService.postQuery: query FAILED, statusCode: " + statusCode);
                 log.error("BeaconQueryService.postQuery: jsonBeaconRequest: " + jsonBeaconRequest);
+                log.error("BeaconQueryService.postQuery: reasonPhrase: " + response.getStatusLine().getReasonPhrase());
                 Header locationHeader = response.getFirstHeader("Location");
                 if (locationHeader != null)
                     log.error("BeaconQueryService.postQuery: Location: " + locationHeader.getValue());

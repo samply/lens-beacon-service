@@ -16,7 +16,11 @@ import java.util.List;
 public class GenomicVariationBaseChangeAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconSearchParameters convert(AstNode astNode) {
-        String change = (String) ((List) astNode.value).get(0);
+        String change = getStringOrFirstOfList(astNode);
+        if (change == null) {
+            log.warn("convert: change is null");
+            return(null);
+        }
         String referenceBase = change.split(">")[0];
         String alternateBase = change.split(">")[1];
         BeaconSearchParameters parameters = new BeaconSearchParameters(BeaconSearchParameters.ParameterBlockType.REQUEST_PARAMETER);

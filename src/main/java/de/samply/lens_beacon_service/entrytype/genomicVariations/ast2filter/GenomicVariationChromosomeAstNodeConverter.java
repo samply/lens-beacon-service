@@ -17,10 +17,15 @@ import java.util.List;
 public class GenomicVariationChromosomeAstNodeConverter extends AstNodeConverter {
     @Override
     public BeaconSearchParameters convert(AstNode astNode) {
-        String chromosome = (String) ((List) astNode.value).get(0);
+        String chromosome = getStringOrFirstOfList(astNode);
+        if (chromosome == null) {
+            log.warn("convert: chromosome is null");
+            return(null);
+        }
         BeaconSearchParameters parameters = new BeaconSearchParameters(BeaconSearchParameters.ParameterBlockType.REQUEST_PARAMETER);
         // TODO: at some point, it would be good to add the chromosome number or the relevant ontology term e.g. NC_000017.11
-        //parameters.addParameter("Chromosome", chromosome);
+        parameters.addParameter("Chromosome", chromosome);
+        parameters.addParameter("chromosome", chromosome);
         parameters.addParameter("variantType", "SNP");
 
         return(parameters);
