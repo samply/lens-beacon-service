@@ -20,13 +20,13 @@ public class Sites {
 
         // Site definitions
         sites.add(new GdiStarterKitSite());
-//        sites.add(new GdiStarterKitBeamConnectSite());
+        sites.add(new GdiStarterKitBeamConnectSite());
 //        sites.add(new HdCinecaSite());
 //        sites.add(new HdCinecaBeamConnectSite());
 //        sites.add(new EgaCinecaSite());
-//        sites.add(new MolgenisMutationsSite());
-//        sites.add(new RdcPlaygroundSite());
-//        sites.add(new ProgenetixSite());
+        sites.add(new MolgenisMutationsSite());
+        sites.add(new RdcPlaygroundSite());
+        sites.add(new ProgenetixSite());
 //        sites.add(new CafeVariomeSite());
 
         return sites;
